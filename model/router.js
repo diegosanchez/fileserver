@@ -16,9 +16,7 @@ Router.prototype.process = function(request, response) {
 		response.writeHead( 500);
 	}
 	else {
-		handlers.forEach( function (route) {
-			route.cb(response);
-		})
+		handlers[0].cb( response );
 	}
 
 	response.end();
