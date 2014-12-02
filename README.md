@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/diegosanchez/fileserver.svg?branch=master)](https://travis-ci.org/diegosanchez/fileserver)
 FileServer
 ==========
 
@@ -14,3 +15,5 @@ TODO
 1. Navigate through directories
 2. Download files
 3. Download zipped directories
+
+[![Build Status](https://travis-ci.org/diegosanchez/fileserver.svg?branch=master)](https://travis-ci.org/diegosanchez/fileserver)
