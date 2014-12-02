@@ -3,10 +3,15 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "node ./node_modules/.bin/mocha"
   },
   "dependencies": {
     "mime": "*",
     "q": "~1.1.2"
+  },
+  "devDependencies": {
+    "mocha": "~2.0.1",
+    "expect": "~1.0.2"
   }
 }
