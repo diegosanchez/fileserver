@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/diegosanchez/fileserver.svg?branch=master)](https://travis-ci.org/diegosanchez/fileserver)
 FileServer
 ==========
 
@@ -15,3 +16,5 @@ TODO
 2. Download files
 3. Download zipped directories
 4. Remove  html from model's clases
+
+[![Build Status](https://travis-ci.org/diegosanchez/fileserver.svg?branch=master)](https://travis-ci.org/diegosanchez/fileserver)
