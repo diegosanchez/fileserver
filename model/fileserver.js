@@ -42,6 +42,10 @@ FileServer.prototype.file2html = function (fileStatus) {
   return util.format(format, fileStatus.file, fileStatus.file);
 }
 
+FileServer.prototype.requestToLocalFile = function(url) {
+  return path.join( this.dir, url.split("/").slice(2).join("/"));
+};
+
 FileServer.prototype.loadRoutes = function() {
 var self = this;
 var routes = [
@@ -50,7 +54,7 @@ var routes = [
 
     }],
     [ /\/file\/.+/, function (req, res) {
-        var localFilePath = path.join( self.dir, path.basename(req.url) );
+        var localFilePath = self.requestToLocalFile( req.url );
         var fStat = Q.denodeify(fs.stat);
 
         fStat(localFilePath)
