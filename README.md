@@ -14,3 +14,4 @@ TODO
 1. Navigate through directories
 2. Download files
 3. Download zipped directories
+4. Remove  html from model's clases
