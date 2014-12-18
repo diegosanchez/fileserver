@@ -46,14 +46,8 @@ FileServer.prototype.requestToLocalFile = function(url) {
   return path.join( this.dir, url.split("/").slice(2).join("/"));
 };
 
-FileServer.prototype.loadRoutes = function() {
-var self = this;
-var routes = [
-    [ /\/directory\/.+/, function (req, res) {
-        res.end( "Directory: " + req.url );
-
-    }],
-    [ /\/file\/.+/, function (req, res) {
+FileServer.prototype.responseFile = function(req, res) {
+  var self = this;
         var localFilePath = self.requestToLocalFile( req.url );
         var fStat = Q.denodeify(fs.stat);
 
@@ -75,6 +69,16 @@ var routes = [
             res.end();
           })
           .done();
+
+};
+FileServer.prototype.loadRoutes = function() {
+var self = this;
+var routes = [
+    [ /\/directory\/.+/, function (req, res) {
+        res.end( "Directory: " + req.url );
+
+    }],
+    [ /\/file\/.+/, function (req, res) {
     }],
     [ /\//, function (req, res) {
       var fReadDir = Q.denodeify(fs.readdir); 
