@@ -9,6 +9,16 @@ describe('FileSystem model', function() {
 		})
 	});
 
+	describe( '#freaddir', function (done) {
+		it('should return directory content', function(done) {
+			var fReadDir = FileSystem.freaddir('dir_to_serve/nested_dir_01');
+			fReadDir.then( function (files) {
+				expect(files).toContain( 'file_01_01.txt');
+				done();
+			});			
+		});
+	});
+
 	describe( '#fstat', function (done) {
 		it('should return status error', function(done) {
 			var fStat = FileSystem.fstat('doesnt_exist_file.txt');
