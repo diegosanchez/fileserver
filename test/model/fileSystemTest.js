@@ -9,6 +9,19 @@ describe('FileSystem model', function() {
 		})
 	});
 
+	describe('#frstream', function(done) {
+		it('should return a read stream', function(done) {
+
+			FileSystem.frstream('dir_to_serve/nested_dir_01/file_01_01.txt')
+				.then( function(stream) {
+					console.log("content:", stream.read());
+					expect(stream.toString()).toContain('file_01_01 content');
+					done();
+			});
+		});
+		
+	});
+
 	describe( '#freaddir', function (done) {
 		it('should return directory content', function(done) {
 			var fReadDir = FileSystem.freaddir('dir_to_serve/nested_dir_01');
@@ -31,8 +44,8 @@ describe('FileSystem model', function() {
 		it('should return file status', function(done) {
 			var fStat = FileSystem.fstat('dir_to_serve/nested_dir_01/file_01_01.txt');
 
-			fStat.then( function (stat) {
-				expect(stat.isFile()).toBe(true);
+			fStat.then( function (result) {
+				expect(result.status.isFile()).toBe(true);
 				done();
 			});
 		});
@@ -40,8 +53,8 @@ describe('FileSystem model', function() {
 		it('should return directory status', function(done) {
 			var fStat = FileSystem.fstat('dir_to_serve/nested_dir_01');
 
-			fStat.then( function (stat) {
-				expect(stat.isDirectory()).toBe(true);
+			fStat.then( function (result) {
+				expect(result.status.isDirectory()).toBe(true);
 				done();
 			});
 		});

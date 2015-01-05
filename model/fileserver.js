@@ -5,31 +5,21 @@ var url = require('url');
 var mime = require('mime');
 var path = require('path');
 var Q = require('q');
+var FileSystem = require('./filesystem');
 
 function FileServer() {
+    this.port = 3000;
+    this.dir = process.cwd();
+    this.routes = [];
 };
 
 FileServer.prototype.init = function(options) {
     var opts = options || {};
-    var self = this;
 
-    self.port = opts.port || 3000;
-    self.dir = process.cwd();
+    this.port = opts.port || 3000;
+    this.dir = process.cwd();
 
-    return self
-}
-
-FileServer.prototype.fileStat = function(fullPath) {
-  var deferred = Q.defer();
-
-  fs.stat( fullPath, function (err, stat) {
-    if (err)
-      deferred.reject(err);
-
-    deferred.resolve( { file: fullPath, status: stat});
-
-  })
-  return deferred.promise;
+    return this;
 }
 
 FileServer.prototype.file2html = function (fileStatus) {
@@ -46,69 +36,58 @@ FileServer.prototype.requestToLocalFile = function(url) {
   return path.join( this.dir, url.split("/").slice(2).join("/"));
 };
 
-FileServer.prototype.responseFile = function(req, res) {
-  var self = this;
-        var localFilePath = self.requestToLocalFile( req.url );
-        var fStat = Q.denodeify(fs.stat);
-
-        fStat(localFilePath)
-          .then( function ( /* stat */) {
-              var deferred = Q.defer();
-              var stream = fs.createReadStream(localFilePath);
-
-              stream.on('end', function () {deferred.resolve(); });
-              stream.on('error', function (error) {deferred.reject(error); });
-
-              res.setHeader( 'content-type', mime.lookup(req.url) );
-              stream.pipe( res);
-
-              return deferred.promise;
-          })
-          .catch( function (error) {
-            res.writeHead( 404);
-            res.end();
-          })
-          .done();
-
+FileServer.prototype.record = function(pattern, callback) {
+  this.routes.push( {pattern: pattern, cb: callback });
 };
+
+FileServer.prototype.rootHandler = function(req, res) {
+  var self = this;
+  console.log("HP", self);
+
+  var fReadDir = FileSystem.freaddir(self.dir);
+
+  fReadDir
+  .then( function (files) {
+    // Create stat promises for each file
+    var statPromises = files.map( function (f) {
+      return FileSystem.fstat(f);
+    });
+
+    Q.allSettled( statPromises).then( function (results) {
+      res.write("<html>\n");
+      results.forEach( function (entry, index, array) {
+        res.write( self.file2html(entry.value) );
+        if ( index === array.length - 1 ) {
+          res.write("</html>\n");
+          res.end();
+        };
+      })
+    })
+  })
+  .catch( function (error) {
+    res.writeHead( 500);
+    res.end();
+  })
+  .done();
+
+
+}
+
+FileServer.prototype.handlerFile = function(req, res) {
+}
+
+FileServer.prototype.handlerDirectory = function(req, res) {
+  res.end( "Directory: " + req.url );
+}
+
 FileServer.prototype.loadRoutes = function() {
-var self = this;
-var routes = [
-    [ /\/directory\/.+/, function (req, res) {
-        res.end( "Directory: " + req.url );
+  var self = this;
 
-    }],
-    [ /\/file\/.+/, function (req, res) {
-    }],
-    [ /\//, function (req, res) {
-      var fReadDir = Q.denodeify(fs.readdir); 
+  this.record( /\/directory\/.+/, this.handlerDirectory);
 
-      fReadDir(self.dir).then( function (files) {
-        // Create stat promises for each file
-        var statPromises = files.map( function (f) {
-          return self.fileStat(f);
-        });
+  this.record( /\/file\/.+/, this.handlerFile);
 
-        Q.allSettled( statPromises).then( function (results) {
-          res.write("<html>\n");
-          results.forEach( function (entry, index, array) {
-            res.write( self.file2html(entry.value) );
-            if ( index === array.length - 1 ) {
-              res.write("</html>\n");
-              res.end();
-            };
-          })
-        })
-      })
-      .catch( function (error) {
-        res.writeHead( 500);
-        res.end();
-      })
-      .done();
-    }]
-];
-
-self.routes = routes;
+  this.record( /\//, this.rootHandler );
 }
 
 FileServer.prototype.start = function() {
@@ -120,13 +99,14 @@ FileServer.prototype.start = function() {
 
 	this.http = http.createServer( function (req, res) {
     for( var i in self.routes) {
-        if ( self.routes[i][0].test( req.url ) ) {
-            self.routes[i][1]( req, res);
+        if ( self.routes[i].pattern.test( req.url ) ) {
+            var callBack = self.routes[i].cb.bind(self);
+            callBack( req, res);
             return;
         }
     }
 
-    self.routes[-1][1]( req, res);
+    self.routes[-1].cb( req, res);
 	});
 
 	this.http.listen( this.port );
