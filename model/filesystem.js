@@ -10,15 +10,21 @@ function FileSystem (root) {
 FileSystem.prototype.frstream = function(fullPathFile) {
   var deferred = Q.defer();
 
-  this.fstat(fullPathFile).then( function (args) {
+  var _success = function (args) {
   	if ( args.status.isDirectory() ) {
+  		console.log('b 2');
   		deferred.reject(new Error('Not a file'));
   	}
   	else {
   		deferred.resolve( fs.createReadStream(fullPathFile) );
   	}
-  });
+  };
 
+  var _error = function (reason) {
+	deferred.reject(new Error('Not a file'));
+  };
+
+  this.fstat(fullPathFile).then( _success, _error );
 
   return deferred.promise;
 };

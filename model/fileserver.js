@@ -76,12 +76,20 @@ FileServer.prototype.rootHandler = function(req, res) {
 };
 
 FileServer.prototype.handlerFile = function(req, res) {
+  console.log('file handler', req.url);
   var fRStream = FileSystem.frstream( this.requestToLocalFile(req.url));
 
-  fRStream.then( function(buffer) {
-    res.end(buffer);
-  });
+  var _error = function (reason) {
+    res.writeHead(500);
+    res.end();
+  };
 
+  fRStream.then(
+    function(stream) {stream.pipe(res); },  // success
+    _error                                  // error
+  )
+  .catch( _error  );
+ 
 };
 
 FileServer.prototype.handlerDirectory = function(req, res) {
