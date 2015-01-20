@@ -15,7 +15,7 @@ FileSystem.prototype.frstream = function(fullPathFile) {
   		deferred.reject(new Error('Not a file'));
   	}
   	else {
-  		deferred.resolve( fs.readFileSync(fullPathFile) );
+  		deferred.resolve( fs.createReadStream(fullPathFile) );
   	}
   });
 

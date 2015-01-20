@@ -15,10 +15,11 @@ describe('FileSystem model', function() {
 	describe('#frstream', function(done) {
 		it('should return a read stream', function(done) {
 			var fRStream = FileSystem.frstream('dir_to_serve/nested_dir_01/file_01_01.txt');
-
-			fRStream.then( function(buffer) {
-				expect(buffer.toString()).toEqual('file_01_01 content');
-				done();
+			fRStream.then( function(stream) {
+				stream.on('data', function (chunk) {
+					expect(String(chunk)).toEqual('file_01_01 content');
+					done();
+				});
 			});
 		});
 		

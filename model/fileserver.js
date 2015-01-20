@@ -44,7 +44,6 @@ FileServer.prototype.record = function(pattern, callback) {
 
 FileServer.prototype.rootHandler = function(req, res) {
   var self = this;
-  console.log('HP', self);
 
   var fReadDir = FileSystem.freaddir(self.dir);
 
@@ -55,7 +54,8 @@ FileServer.prototype.rootHandler = function(req, res) {
       return FileSystem.fstat(f);
     });
 
-    Q.allSettled( statPromises).then( function (results) {
+    Q.allSettled( statPromises)
+    .then( function (results) {
       res.write('<html>\n');
       results.forEach( function (entry, index, array) {
         res.write( self.file2html(entry.value) );
@@ -76,6 +76,12 @@ FileServer.prototype.rootHandler = function(req, res) {
 };
 
 FileServer.prototype.handlerFile = function(req, res) {
+  var fRStream = FileSystem.frstream( this.requestToLocalFile(req.url));
+
+  fRStream.then( function(buffer) {
+    res.end(buffer);
+  });
+
 };
 
 FileServer.prototype.handlerDirectory = function(req, res) {
