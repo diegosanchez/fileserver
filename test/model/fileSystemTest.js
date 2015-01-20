@@ -1,22 +1,24 @@
+'use strict';
+
 var mock = require('mock-fs');
 var expect = require('expect');
+
 var FileSystem = require('../../model/filesystem.js');
 
 describe('FileSystem model', function() {
 	beforeEach( function () {
 		mock({
 			'dir_to_serve/nested_dir_01/file_01_01.txt': 'file_01_01 content'
-		})
+		});
 	});
 
 	describe('#frstream', function(done) {
 		it('should return a read stream', function(done) {
+			var fRStream = FileSystem.frstream('dir_to_serve/nested_dir_01/file_01_01.txt');
 
-			FileSystem.frstream('dir_to_serve/nested_dir_01/file_01_01.txt')
-				.then( function(stream) {
-					console.log("content:", stream.read());
-					expect(stream.toString()).toContain('file_01_01 content');
-					done();
+			fRStream.then( function(buffer) {
+				expect(buffer.toString()).toEqual('file_01_01 content');
+				done();
 			});
 		});
 		

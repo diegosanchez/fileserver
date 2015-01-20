@@ -1,3 +1,5 @@
+'use strict';
+
 var Q = require('q');
 var fs = require('fs');
 
@@ -10,11 +12,10 @@ FileSystem.prototype.frstream = function(fullPathFile) {
 
   this.fstat(fullPathFile).then( function (args) {
   	if ( args.status.isDirectory() ) {
-  		deferred.reject(new Error("Not a file"));
+  		deferred.reject(new Error('Not a file'));
   	}
   	else {
-  		console.log(fs.createReadStream(fullPathFile) );
-  		deferred.resolve( fs.createReadStream(fullPathFile) );
+  		deferred.resolve( fs.readFileSync(fullPathFile) );
   	}
   });
 
@@ -32,7 +33,7 @@ FileSystem.prototype.fstat = function(fullPath) {
 
 	    deferred.resolve( { file: fullPath, status: stat});
 
-	  })
+	  });
 	  return deferred.promise;
 	}
 
@@ -40,7 +41,7 @@ FileSystem.prototype.fstat = function(fullPath) {
 };
 
 FileSystem.prototype.freaddir = function(fullPath) {
-	return Q.denodeify(fs.readdir)(fullPath)
+	return Q.denodeify(fs.readdir)(fullPath);
 };
 
 

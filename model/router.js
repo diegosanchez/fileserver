@@ -1,10 +1,12 @@
+'use strict';
+
 function Router() {
 	this.routes = [];
 }
 
 Router.prototype.get = function( url, callback) {
 	this.routes.push( { url: url, cb: callback } );
-}
+};
 
 Router.prototype.process = function(request, response) {
 
@@ -20,6 +22,6 @@ Router.prototype.process = function(request, response) {
 	}
 
 	response.end();
-}
+};
 
 module.exports = Router;
