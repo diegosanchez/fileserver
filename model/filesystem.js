@@ -2,6 +2,7 @@
 
 var Q = require('q');
 var fs = require('fs');
+var path = require('path');
 
 function FileSystem (root) {
 	this.root = root;
@@ -47,7 +48,39 @@ FileSystem.prototype.fstat = function(fullPath) {
 };
 
 FileSystem.prototype.freaddir = function(fullPath) {
-	return Q.denodeify(fs.readdir)(fullPath);
+  var deferred = Q.defer();
+
+  fs.readdir( fullPath, function (err, files) {
+    if (err) {
+      deferred.reject(err); 
+    } else {
+      deferred.resolve( 
+        files.map( function (e) {           // Include parent directory info
+          return path.join( fullPath, e); 
+        })
+      );
+    }
+  });
+
+  return deferred.promise;
+};
+
+/***
+* It returns a set of file's status per entry inside the directory
+*/
+FileSystem.prototype.exploreDir = function(fullPath) {
+  var self = this;
+
+  var fReadDir = self.freaddir(fullPath);
+
+  return fReadDir.then( function (files) {
+      // Create stat promises for each file
+      var statPromises = files.map( function (f) {
+        return self.fstat(f);
+      });
+      
+      return Q.allSettled( statPromises);
+    });
 };
 
 

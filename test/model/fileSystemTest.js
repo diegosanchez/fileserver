@@ -29,7 +29,7 @@ describe('FileSystem model', function() {
 		it('should return directory content', function(done) {
 			var fReadDir = FileSystem.freaddir('dir_to_serve/nested_dir_01');
 			fReadDir.then( function (files) {
-				expect(files).toContain( 'file_01_01.txt');
+				expect(files).toContain( 'dir_to_serve/nested_dir_01/file_01_01.txt');
 				done();
 			});			
 		});
@@ -49,6 +49,7 @@ describe('FileSystem model', function() {
 
 			fStat.then( function (result) {
 				expect(result.status.isFile()).toBe(true);
+				expect(result.file).toEqual('dir_to_serve/nested_dir_01/file_01_01.txt');
 				done();
 			});
 		});

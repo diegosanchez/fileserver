@@ -1,82 +1,66 @@
 'use strict';
 
 var util = require('util');
-var fs = require('fs');
 var http = require('http');
 var url = require('url');
-var mime = require('mime');
 var path = require('path');
 var Q = require('q');
 var FileSystem = require('./filesystem');
 
 function FileServer() {
-    this.port = 3000;
-    this.dir = process.cwd();
-    this.routes = [];
+    this.init();
 }
 
+/***
+* It sets up initial server configuration
+**/
 FileServer.prototype.init = function(options) {
     var opts = options || {};
 
     this.port = opts.port || 3000;
     this.dir = process.cwd();
+    this.routes = [];
 
     return this;
 };
 
-FileServer.prototype.file2html = function (fileStatus) {
-  var format = '<div><a href=\"/file/%s\">%s</a></div>\n';
-
-  if ( fileStatus.status.isDirectory() ) {
-      format = '<div><a href=\"/directory/%s\">%s</a></div>\n';
-  }
-
-  return util.format(format, fileStatus.file, fileStatus.file);
-};
-
-FileServer.prototype.requestToLocalFile = function(url) {
-  return path.join( this.dir, url.split('/').slice(2).join('/'));
-};
-
+/***
+* It records a new root and its handler
+*
+* pattern: Regex which define route,
+* callback: Request handler
+*/
 FileServer.prototype.record = function(pattern, callback) {
   this.routes.push( {pattern: pattern, cb: callback });
 };
 
-FileServer.prototype.rootHandler = function(req, res) {
-  var self = this;
-
-  var fReadDir = FileSystem.freaddir(self.dir);
-
-  fReadDir
-  .then( function (files) {
-    // Create stat promises for each file
-    var statPromises = files.map( function (f) {
-      return FileSystem.fstat(f);
-    });
-
-    Q.allSettled( statPromises)
-    .then( function (results) {
-      res.write('<html>\n');
-      results.forEach( function (entry, index, array) {
-        res.write( self.file2html(entry.value) );
-        if ( index === array.length - 1 ) {
-          res.write('</html>\n');
-          res.end();
-        }
-      });
-    });
-  })
-  .catch( function (error) {
-    res.writeHead( 500);
-    res.end();
-  })
-  .done();
-
-
+/***
+* It loads resources published by the server
+**/
+FileServer.prototype.loadRoutes = function() {
+  this.record( /\/directory\/.+/, this.handlerDirectory);
+  this.record( /\/file\/.+/, this.handlerFile);
+  this.record( /\//, this.rootHandler );
 };
 
+/***
+* Handler for root resource
+*/
+FileServer.prototype.rootHandler = function(req, res) {
+  this.deliversDir(this.dir, res);
+};
+
+/***
+* Handler for directory resources
+*/
+FileServer.prototype.handlerDirectory = function(req, res) {
+  this.deliversDir( this.requestToLocalFile(req.url), res );
+};
+
+/***
+* Handler for file resources
+*/
 FileServer.prototype.handlerFile = function(req, res) {
-  console.log('file handler', req.url);
   var fRStream = FileSystem.frstream( this.requestToLocalFile(req.url));
 
   var _error = function (reason) {
@@ -92,18 +76,41 @@ FileServer.prototype.handlerFile = function(req, res) {
  
 };
 
-FileServer.prototype.handlerDirectory = function(req, res) {
-  res.end( 'Directory: ' + req.url );
-};
-
-FileServer.prototype.loadRoutes = function() {
+FileServer.prototype.deliversDir = function(dirPath, res) {
   var self = this;
 
-  this.record( /\/directory\/.+/, this.handlerDirectory);
+  FileSystem.exploreDir(dirPath).then(
+    function (contents) {
+      res.write('<html>\n');
+      contents.forEach( function (entry, index, array) {
+        res.write( self.file2html(entry.value) );
+        if ( index === array.length - 1 ) {
+          res.write('</html>\n');
+          res.end();
+        }
+      });
+    },
+    function (reason) {
+      return new Error(reason);
+    })
+  .catch( function (reason)  { new Error('Not a dir'); })
+  .done();
 
-  this.record( /\/file\/.+/, this.handlerFile);
+};
 
-  this.record( /\//, this.rootHandler );
+FileServer.prototype.file2html = function (fileStatus) {
+  var format = '<div><a href=\"/file/%s\">%s</a></div>\n';
+  var relativePath = path.relative(this.dir, fileStatus.file);
+
+  if ( fileStatus.status.isDirectory() ) {
+      format = '<div><a href=\"/directory/%s\">%s</a></div>\n';
+  }
+
+  return util.format(format, relativePath, relativePath);
+};
+
+FileServer.prototype.requestToLocalFile = function(url) {
+  return path.join( url.split('/').slice(2).join('/'));
 };
 
 FileServer.prototype.start = function() {
