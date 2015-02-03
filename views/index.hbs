@@ -1,15 +1,16 @@
-<div class="row server-status-row" > <!-- server status -->
-<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-	<div class="row">
-		<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 directory-status">
-			<h3>Current: {{current}}</h3>
-		</div>
-		<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 directory-content">
-			{{#each contents}}
-				<p><a href='{{resourcePath value ../current}}'>
-				{{relativePath value.file ../current}}</a></p>
-			{{/each}}
-		</div>
+<div class="row"> <!-- watched directory -->
+	<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 directory-status">
+		<h4>Current: {{current}}</h4>
 	</div>
 </div>
-</div> <!-- 'server status -->
+<div class="row"> <!-- directory content -->
+	<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 directory-status">
+		{{#each contents}}
+		<div class="row">
+			<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 directory-status">
+				<a href='{{resourcePath value ../current}}'>{{relativePath value.file ../current}}</a>
+			</div>
+		</div>
+		{{/each}}
+	</div>
+</div>

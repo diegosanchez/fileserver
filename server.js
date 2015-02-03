@@ -16,11 +16,29 @@ var templateEngine = exphbs({
 
 app.engine('hbs', templateEngine );
 app.set('view engine', 'hbs');
-
 app.use( '/static', express.static(__dirname + '/public'));
 
 app.get('/', function (req, res) {
-	var directory = process.cwd();
+	var directory = '.';
+
+	FileSystem.exploreDir( directory ).then( function (dirContent) {
+		res.render('index', {
+			current: directory,
+			contents: dirContent
+		});
+	});
+});
+
+app.get('/file', function (req, res) {
+	var fRStream = FileSystem.frstream( req.query.id );
+
+	fRStream.then( function(stream) {
+		stream.pipe(res); 
+	});
+});
+
+app.get('/directory', function (req, res) {
+	var directory = req.query.id;
 
 	FileSystem.exploreDir( directory ).then( function (dirContent) {
 		res.render('index', {

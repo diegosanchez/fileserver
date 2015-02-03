@@ -9,9 +9,14 @@ exports.relativePath = function (file, current) {
 };
 
 exports.resourcePath = function  (entry, currentDirectory) {
-	var format = (entry.status.isDirectory() ) ? '/directory/%s' : '/file/%s';
+	var format = (entry.status.isDirectory() ) ? '/directory' : '/file';
 
-	return util.format(format, path.relative(currentDirectory, entry.file) );
+	format += '?id=%s';
+
+	console.log("format:", format, "entry:", entry.file, " currentDirectory:", currentDirectory);
+	console.log("entry:", entry.file, " formated:", util.format(format, entry.file));
+
+	return util.format(format, entry.file);
 };
 
 }());
