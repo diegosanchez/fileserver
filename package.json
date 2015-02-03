@@ -3,11 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app.js",
+    "start": "node server.js",
     "test": "node ./node_modules/.bin/mocha --recursive test"
   },
   "dependencies": {
-    "mime": "*",
+    "express": "^4.11.2",
+    "express-handlebars": "^1.1.0",
+    "mime": "^1.2.11",
     "q": "~1.1.2"
   },
   "devDependencies": {
