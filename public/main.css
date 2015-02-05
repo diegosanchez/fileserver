@@ -1,0 +1,14 @@
+.current-directory {
+	border-bottom: solid 2px #eee;
+}
+
+.watched-directory {
+				   border: solid 2px #eee;
+	-webkit-border-radius: 5px;
+	   -moz-border-radius: 5px;
+		    border-radius: 5px;
+}
+
+.file_even {
+	background-color: #F0F0F5;
+}

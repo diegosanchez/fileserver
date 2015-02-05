@@ -1,16 +1,22 @@
-<div class="row"> <!-- watched directory -->
-	<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 directory-status">
-		<h4>Current: {{current}}</h4>
+<div class="row watched-directory" > 					<!-- watched directory -->
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">	<!-- wd col -->
+	<div class="row current-directory">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<h4>Current: {{current}}</h4>
+		</div>
 	</div>
-</div>
-<div class="row"> <!-- directory content -->
-	<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 directory-status">
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 		{{#each contents}}
-		<div class="row">
-			<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 directory-status">
-				<a href='{{resourcePath value ../current}}'>{{relativePath value.file ../current}}</a>
+		<div class="row {{alternateClass @index 'file'}}">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 directory-status">
+				<a 	href='{{resourcePath value ../current}}'>
+				{{relativePath value.file ../current}}
+				</a>
 			</div>
 		</div>
 		{{/each}}
+		</div>
 	</div>
-</div>
+</div> <!-- 'wd col --> 
+</div> <!-- 'watched directory -->
