@@ -12,3 +12,7 @@
 .file_even {
 	background-color: #F0F0F5;
 }
+
+a.directory-entry {
+	font-weight: bold;
+}

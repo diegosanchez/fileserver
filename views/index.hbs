@@ -10,7 +10,8 @@
 		{{#each contents}}
 		<div class="row {{alternateClass @index 'file'}}">
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 directory-status">
-				<a 	href='{{resourcePath value ../current}}'>
+				<a 	href='{{resourcePath value ../current}}' 
+					class='{{entryClass value}}'>
 				{{relativePath value.file ../current}}
 				</a>
 			</div>

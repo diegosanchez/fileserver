@@ -4,6 +4,13 @@
 var util = require('util');
 var path = require('path');
 
+/****
+* It returns class according to directory entry type (file or directory)
+**/
+exports.entryClass = function (entry) {
+	return ((entry.status.isDirectory()) ? 'directory' : 'file') + '-entry';
+};
+
 /***
 * It returns 'style_even' whether index is even or 'style_odd' whether
 * index is odd

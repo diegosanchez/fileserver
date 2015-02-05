@@ -19,7 +19,7 @@ app.set('view engine', 'hbs');
 app.use( '/static', express.static(__dirname + '/public'));
 
 app.get('/', function (req, res) {
-	var directory = '.';
+	var directory = '/tmp';
 
 	FileSystem.exploreDir( directory ).then( function (dirContent) {
 		res.render('index', {
