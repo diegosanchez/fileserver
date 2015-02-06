@@ -35,9 +35,6 @@ exports.resourcePath = function  (entry, currentDirectory) {
 
 	format += '?id=%s';
 
-	console.log("format:", format, "entry:", entry.file, " currentDirectory:", currentDirectory);
-	console.log("entry:", entry.file, " formated:", util.format(format, entry.file));
-
 	return util.format(format, entry.file);
 };
 

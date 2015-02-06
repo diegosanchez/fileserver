@@ -19,9 +19,9 @@ app.set('view engine', 'hbs');
 app.use( '/static', express.static(__dirname + '/public'));
 
 app.get('/', function (req, res) {
-	var directory = '/tmp';
+	var directory = fileSystem.root;
 
-	FileSystem.exploreDir( directory ).then( function (dirContent) {
+	fileSystem.exploreDir( directory ).then( function (dirContent) {
 		res.render('index', {
 			current: directory,
 			contents: dirContent
@@ -30,7 +30,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/file', function (req, res) {
-	var fRStream = FileSystem.frstream( req.query.id );
+	var fRStream = fileSystem.frstream( req.query.id );
 
 	fRStream.then( function(stream) {
 		stream.pipe(res); 
@@ -40,7 +40,7 @@ app.get('/file', function (req, res) {
 app.get('/directory', function (req, res) {
 	var directory = req.query.id;
 
-	FileSystem.exploreDir( directory ).then( function (dirContent) {
+	fileSystem.exploreDir( directory ).then( function (dirContent) {
 		res.render('index', {
 			current: directory,
 			contents: dirContent
@@ -48,11 +48,22 @@ app.get('/directory', function (req, res) {
 	});
 });
 
-var server = app.listen( 3000, function () {
+var args = require('argsparser').parse();
+
+/****
+* Arguments:
+* 	+ -p: Listening port
+*   + -d: Directory to watch
+*/
+var port = args['-p'] || 3000;
+var fileSystem = new FileSystem(args['-d'] || '.');
+
+var server = app.listen( port, function () {
 	var host = server.address().address;
 	var port = server.address().port;
 
 	console.log('Fileserver listining at http://%s:%s...', host, port);
+	console.log('Watching:', fileSystem.root);
 });
 
 }());

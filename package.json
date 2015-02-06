@@ -7,6 +7,7 @@
     "test": "node ./node_modules/.bin/mocha --recursive test"
   },
   "dependencies": {
+    "argsparser": "0.0.6",
     "express": "^4.11.2",
     "express-handlebars": "^1.1.0",
     "mime": "^1.2.11",

@@ -84,4 +84,4 @@ FileSystem.prototype.exploreDir = function(fullPath) {
 };
 
 
-module.exports = new FileSystem();
+module.exports = FileSystem;
