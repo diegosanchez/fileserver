@@ -1,3 +1,5 @@
+(function () {
+
 'use strict';
 
 var mock = require('mock-fs');
@@ -12,9 +14,11 @@ describe('FileSystem model', function() {
 		});
 	});
 
+	var fsWrapper = new FileSystem('dir_to_serve/');
+
 	describe('#frstream', function(done) {
 		it('should return a read stream', function(done) {
-			var fRStream = FileSystem.frstream('dir_to_serve/nested_dir_01/file_01_01.txt');
+			var fRStream = fsWrapper.frstream('dir_to_serve/nested_dir_01/file_01_01.txt');
 			fRStream.then( function(stream) {
 				stream.on('data', function (chunk) {
 					expect(String(chunk)).toEqual('file_01_01 content');
@@ -27,7 +31,7 @@ describe('FileSystem model', function() {
 
 	describe( '#freaddir', function (done) {
 		it('should return directory content', function(done) {
-			var fReadDir = FileSystem.freaddir('dir_to_serve/nested_dir_01');
+			var fReadDir = fsWrapper.freaddir('dir_to_serve/nested_dir_01');
 			fReadDir.then( function (files) {
 				expect(files).toContain( 'dir_to_serve/nested_dir_01/file_01_01.txt');
 				done();
@@ -37,7 +41,7 @@ describe('FileSystem model', function() {
 
 	describe( '#fstat', function (done) {
 		it('should return status error', function(done) {
-			var fStat = FileSystem.fstat('doesnt_exist_file.txt');
+			var fStat = fsWrapper.fstat('doesnt_exist_file.txt');
 
 			fStat.fail( function (err) {
 				done();
@@ -45,7 +49,7 @@ describe('FileSystem model', function() {
 		});
 
 		it('should return file status', function(done) {
-			var fStat = FileSystem.fstat('dir_to_serve/nested_dir_01/file_01_01.txt');
+			var fStat = fsWrapper.fstat('dir_to_serve/nested_dir_01/file_01_01.txt');
 
 			fStat.then( function (result) {
 				expect(result.status.isFile()).toBe(true);
@@ -55,7 +59,7 @@ describe('FileSystem model', function() {
 		});
 
 		it('should return directory status', function(done) {
-			var fStat = FileSystem.fstat('dir_to_serve/nested_dir_01');
+			var fStat = fsWrapper.fstat('dir_to_serve/nested_dir_01');
 
 			fStat.then( function (result) {
 				expect(result.status.isDirectory()).toBe(true);
@@ -66,3 +70,5 @@ describe('FileSystem model', function() {
 	
 	afterEach( mock.restore);
 });
+
+}());
